@@ -1,2 +1,2 @@
 # Change-Log-Tool
- Creates change logs quickly
+ Manage change logs quickly
