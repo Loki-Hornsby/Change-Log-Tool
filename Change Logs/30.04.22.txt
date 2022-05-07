@@ -1,0 +1,15 @@
+_________
+
+30/04/22:
+_________
+
+Start of project
+Goal is to have this app 
+	- store locations of change logs 
+	- a quick button to add a new changelogs 
+	- view/edit changelogs in saved folders
+	- Automatically create a file containing all changelog files merged into one
+	
++ added Tool.py
++ added settings.yaml
++ added PyYAML

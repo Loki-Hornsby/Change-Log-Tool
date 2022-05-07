@@ -1,0 +1,10 @@
+_________
+
+07/05/22:
+_________
+
+% updated Tool.py
++ added Simple base
+	Doesn't do anything yet other than store locations and names alongside having some pretty placeholders
+	
+Alpha 1
