@@ -1,2 +1,2 @@
 # Change-Log-Tool
- Manage change logs quickly
+- Stores Changelogs location and name
