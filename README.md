@@ -13,3 +13,15 @@
    -   Settings menu
    -   Mergelog (merges all changelogs into a single file - with option to delete whats been merged or to keep it)
    -   Maybe: Custom file type (which would be read by a custom editor built within this app - however this largely increases the scope so will be left for later)
+
+### Dev:
+- Requires:
+   - PYQT5 module
+   - OS module
+   - Datetime module 
+   - heapq module
+   - glob module
+   - yaml module (not the new one (yes i use the old one - mwaahahahhaha))
+   - random module
+   - math module
+   - Permission to read/write to folders and files
