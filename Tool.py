@@ -1,4 +1,3 @@
-from unittest import loader
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
