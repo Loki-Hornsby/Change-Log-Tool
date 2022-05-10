@@ -1,129 +1,13 @@
-# TODO: Fix remove (disable remove button when cell isn't selected)
-
 from unittest import loader
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-import yaml
-
-import math
-import random
-
 import sys
-import os
-from os import listdir, system
-from os.path import *
 
-class settings:
-    GeneratorData = None
-    Data = None
-
-    placeholders = [
-            "(づ￣ ³￣)づ",
-            "( ˘ ³˘)♥",
-            "(ง'̀-'́)ง",
-            "{•̃_•̃}",
-            "[¬º-°]¬",
-            "(∩｀-´)⊃━☆ﾟ.*･｡ﾟ",
-            "(っ˘ڡ˘ς)",
-            "(งツ)ว",
-            "ʕʘ̅͜ʘ̅ʔ",
-            "\(ᵔᵕᵔ)/",
-            "(._.)",
-            "(っ•́｡•́)♪♬",
-            "(•̀ᴗ•́)و ̑̑",
-            "(ᵔᴥᵔ)",
-            "◖ᵔᴥᵔ◗ ♪ ♫",
-            "♪♪ ヽ(ˇ∀ˇ )ゞ",
-            "ヽ(´▽`)/",
-            "ʕ·͡ᴥ·ʔ",
-            "ʕっ•ᴥ•ʔっ",
-            "( ˘ ³˘)ノ°ﾟº❍｡",
-            "(͡ ° ͜ʖ ͡ °)",
-            "(｡◕‿‿◕｡)",
-            "(ᕗ ͠° ਊ ͠° )ᕗ",
-            "ᕕ(⌐■_■)ᕗ ♪♬",
-            "(◕ᴥ◕ʋ)",
-            "(҂◡_◡) ᕤ",
-            "(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧",
-            "(ง •̀_•́)ง",
-            "(✿◠‿◠)",
-            "( つ◕ل͜◕)つ",
-            "༼ つ ╹ ╹ ༽つ",
-            "(*・‿・)ノ⌒*:･ﾟ✧",
-            "(ﾉ☉ヮ⚆)ﾉ ⌒*:･ﾟ✧",
-            "༼つಠ益ಠ༽つ ─=≡ΣO))",
-            "٩( ๑╹ ꇴ╹)۶",
-            "._.)/\(._.",
-            "(づ｡◕‿‿◕｡)づ",
-            "／人◕ ‿‿ ◕人＼"
-        ]
-
-    def GetPlaceholder():
-        return settings.placeholders[random.randint(0, len(settings.placeholders))-1]
-
-    # Load settings
-    def Load():
-        with open("settings.yaml") as stream:
-            try:
-                settings.GeneratorData = yaml.safe_load_all(stream)
-                settings.Data = list(settings.GeneratorData)
-
-                settings.GenerateData()
-            except yaml.YAMLError as exc:
-                print(exc)
-                return None
-
-    def GenerateData():
-        # Get all possible keys
-        settings.StoredKeys = []   # Columns
-        settings.StoredValues = []   # Rows
-
-        # Generate keys
-        for row in range(len(settings.Data)):
-            key = list(settings.Data[row].keys())
-
-            for column in range(math.floor(len(key) / 2)):
-                if key not in settings.StoredKeys:
-                    settings.StoredKeys.append(key)
-
-        settings.StoredKeys = sum(settings.StoredKeys, []) # Convert keys to 1 dimensional array
-
-        # Generate values
-        for column in range(len(settings.Data)):
-            value = list(settings.Data[column].values())
-
-            for row in range(math.floor(len(value) / 2)):
-                settings.StoredValues.append(value)
-
-    # Update Settings
-    def Update(item, row, column):
-        if item != None:
-            # Set the data
-            settings.Data[row][settings.StoredKeys[column]] = item.text()   
-            
-            with open("settings.yaml", "w") as f:
-                yaml.safe_dump_all(settings.Data, f)
-    
-    # Add a document
-    def AddDoc():
-        # Creates an empty document with all keys filled with an empty placeholder in settings.yaml
-        with open("settings.yaml", "w") as f:
-            dic = {}
-
-            for v in settings.StoredKeys:
-                dic[v] = settings.GetPlaceholder()
-            
-            settings.Data.append(dict(dic))
-            yaml.safe_dump_all(settings.Data, f)
-
-    # Delete a document
-    def DelDoc(i):
-        with open("settings.yaml", "w") as f:
-            del settings.Data[i]
-            yaml.safe_dump_all(settings.Data, f)
+import User
+import ContextMenu
             
 class ViewFiles(QWidget):
     def __init__(self):
@@ -164,84 +48,69 @@ class TableView(QTableWidget):
         self.resizeRowsToContents()
         self.resizeColumnsToContents()
 
-        # Active item
-        self.activeItem = None
-
-        # Item
-        self.itemSelected = False
-        self.CurRow = 0
-        self.CurColumn = 0
-
         # Titles
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.verticalHeader().hide()
 
         # Input cell Data
-        for x in range(len(settings.Data)): # Row
-            for y in range(len(settings.StoredKeys)): # Column
-                self.setItem(x, y, self.CreateItem(settings.StoredValues[x][y]))
+        for x in range(len(User.Data.Data)): # Row
+            for y in range(len(User.Data.StoredKeys)): # Column
+                self.setItem(x, y, self.CreateItem(User.Data.StoredValues[x][y]))
         
         # Behaviours 
         for i in range(self.columnCount()):
-            if settings.StoredKeys[i] == "location":
+            if User.Data.StoredKeys[i] == "location":
                 self.setItemDelegateForColumn(i, self.ReadOnlyDelegate(self)) 
             else:
                 self.setItemDelegateForColumn(i, self.CenterDelegate(self)) 
 
         self.setSelectionMode(QTableWidget.SingleSelection)   
 
-        # Update Position
-        self.itemSelectionChanged.connect(lambda: self.SetActive())
-
         # Update Data
-        self.itemChanged.connect(lambda item: settings.Update(item, self.CurRow, self.CurColumn))
+        self.itemChanged.connect(lambda item: self.ItemModified(item))
 
-        # Display Menu
-        self.itemDoubleClicked.connect(lambda item: self.DialogueMenu(item))
+    def mousePressEvent(self, QMouseEvent):
+        # Get index + item
+        index = self.indexAt(QMouseEvent.pos())
+        item = self.item(index.row(), index.column())
 
-    # Store the active row and column selected or default to 0 if there is none
-    def SetActive(self):
-        if self.rowCount() != 1:
-            self.itemSelected = True
-        else:
-            self.itemSelected = False
+        # Set selection
+        self.clearSelection()
+        self.setCurrentItem(item)
 
-        try:
-            self.CurRow = self.currentRow()
-            self.CurColumn = self.currentColumn()
+        # Open Context Menu
+        if QMouseEvent.button() == Qt.RightButton:
+            ContextMenu.Start(self)
+        if QMouseEvent.button() == Qt.LeftButton:
+            pass
 
-            self.activeItem = self.item(self.CurRow, self.CurColumn)
-        except:
-            self.itemSelected = False
+    def ItemModified(self, item):
+        if User.Data.StoredKeys[self.currentColumn()] != "location":
+            CapitalizedInput = " ".join([x.capitalize() for x in item.text().split()])
 
-            self.CurRow = 0
-            self.CurColumn = 0
-            self.activeItem = self.item(0, 0)
-
-    # Select Menu
-    def DialogueMenu(self, item):
-        if (settings.StoredKeys[self.CurColumn] == "location"): # Location
-            folder = QFileDialog.getExistingDirectory(self, "Select Directory")
-            if len(folder) > 0:
-                self.setItem(self.CurRow, self.CurColumn, self.CreateItem(folder))
+            if item.text() != CapitalizedInput:
+                self.setItem(self.currentRow(), self.currentColumn(), self.CreateItem(CapitalizedInput))
+                return
+        
+        User.Data.Update(item, self.currentRow(), self.currentColumn())
 
     def Add(self, button): 
         self.insertRow(self.rowCount())
 
-        settings.AddDoc()
+        User.Data.AddDoc()
 
         for i in range(self.columnCount()):
-            self.setItem(self.rowCount()-1, i, self.CreateItem(settings.GetPlaceholder()))
+            self.setItem(self.rowCount()-1, i, self.CreateItem(User.Data.GetPlaceholder()))
 
         if self.rowCount() == 2:
             button.setEnabled(True)
 
     def Remove(self, button):
         if self.rowCount() > 1:
-            settings.DelDoc(self.CurRow)
+            User.Data.DelDoc(self.currentRow())
 
-            self.removeRow(self.CurRow)
+            self.removeRow(self.currentRow())
 
             self.clearSelection()
             
@@ -252,7 +121,7 @@ class Window(QWidget):
         super().__init__()
 
         # Saved Changelog Data
-        settings.Load()
+        User.Data.Load()
 
         # Setup UI
         self.initUi()
@@ -270,8 +139,8 @@ class Window(QWidget):
         group_box_layout = QVBoxLayout()
 
         # Table
-        rows = [str(x+1) for x in range(len(settings.Data))]
-        columns = settings.StoredKeys
+        rows = [str(x+1) for x in range(len(User.Data.Data))]
+        columns = User.Data.StoredKeys
 
         self.DataTable = TableView(
             rows,            # Y Data
@@ -291,14 +160,15 @@ class Window(QWidget):
         grid.setColumnStretch(4, 4)
         group_box_layout.addLayout(grid)
 
-        # Buttons
+        # Add item to table
         self.add = QPushButton('+', self)
         self.add.clicked.connect(lambda: self.DataTable.Add(self.remove))
         grid.addWidget(self.add, 0, 1)
 
+        # Remove selected item from table
         self.remove = QPushButton('-', self)
         self.remove.clicked.connect(lambda: self.DataTable.Remove(self.remove))
-        self.DataTable.itemSelectionChanged.connect(lambda: self.remove.setEnabled(self.DataTable.itemSelected))
+        self.DataTable.itemSelectionChanged.connect(lambda: self.remove.setEnabled((self.DataTable.rowCount() > 1)))
         self.remove.setEnabled(False)
         grid.addWidget(self.remove, 0, 3)
         
@@ -325,16 +195,6 @@ class Window(QWidget):
     # Make a new changelog
     def New():
         pass
-
-    # View changelog
-    def View(self, itemPath, regularPath):
-        path = ""
-        if exists(itemPath):
-            path = itemPath
-        else:
-            path = regularPath
-
-        os.startfile('"' + path + '"')
 
 # App startup
 if __name__ == '__main__':
