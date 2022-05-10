@@ -21,7 +21,7 @@
    - Datetime module 
    - heapq module
    - glob module
-   - yaml module (not the new one (yes i use the old one - mwaahahahhaha))
+   - yaml module (not the new one [ruamel.yaml] (yes i use the old one - mwaahahahhaha))
    - random module
    - math module
    - Permission to read/write to folders and files
