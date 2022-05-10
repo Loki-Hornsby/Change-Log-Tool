@@ -1,4 +1,11 @@
 # Change-Log-Tool
+
+### Controls:
+-  Right click - Edits selected / Opens Context menu for selected
+-  [+] - Adds a row
+-  [-] - Removes selected row
+
+### Features:
 - Stores Changelogs location and name
 - More to be added soon.... 
    -   Changelog explorer
