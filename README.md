@@ -1,7 +1,7 @@
 # Change-Log-Tool
 
 ### Controls:
--  Right click - Edits selected / Opens Context menu for selected
+-  Right click - Edits selected cell / Opens Context menu for selected cell
 -  [+] - Adds a row
 -  [-] - Removes selected row
 
