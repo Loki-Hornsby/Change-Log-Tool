@@ -8,6 +8,7 @@ import glob
 import os
 from os import listdir, system
 from os.path import *
+from itertools import islice
 
 from datetime import datetime
 
@@ -20,7 +21,7 @@ def Start(self):
             return path
 
         path = ""
-        allfiles = sorted(glob.iglob(GetPath() + '*.txt'), key=os.path.getctime)
+        allfiles = sorted(glob.iglob(GetPath() + '*.txt'), key=os.path.getctime) # all files sorted by date created
 
         def GetDate(format):
             return str(datetime.today().strftime(format))
@@ -30,9 +31,28 @@ def Start(self):
 
         def FileLast():
             files = Folder.allfiles
+            rename = False
+            file = files[2] # return 2nd item in list
 
-            if len(files) > 1:
-                return files[len(files)-2] # (Gets 2nd to last)
+            # If file name != header then flag it and rename it
+            with open(file) as f:
+                # [:-1] to remove ":"
+                thirdline = f.read().split('\n')[2][:-1]
+                # Header date
+                title = file[(len(file) - len("dd.mm.yy.txt")) : (len(file) - len(".txt"))]
+            
+                if title != thirdline:
+                    rename = thirdline
+                
+                f.close()
+            
+            # Rename and reassign file variable
+            if rename != False:
+                renamed = Folder.GetPath() + rename + ".txt"
+                os.rename(file, renamed)
+                file = renamed
+
+            return file
 
     def EditDir():
         directory = QFileDialog.getExistingDirectory(self, "Select Directory")
@@ -42,16 +62,18 @@ def Start(self):
     def CreateChangelog():
         p = Folder.FileToday()
 
+        date = Folder.GetDate('%d.%m.%y:')
+
         f = open(p, "w")
-        f.write("_________" + "\n")
+        f.write(len(date)*"_" + "\n")
         f.write("\n")
-        f.write(Folder.GetDate('%d/%m/%y:') + "\n")
-        f.write("_________" + "\n")
+        f.write(date + "\n")
+        f.write(len(date)*"_" + "\n")
         f.write("\n")
         f.close()
 
-    def ViewChangelog():
-        os.system('"' + Folder.FileLast() + '"')
+    def ViewChangelog(path):
+        os.system('"' + path + '"')
 
     if User.Data.StoredKeys[self.currentColumn()] == "location": # Location
         # Menu
@@ -60,21 +82,29 @@ def Start(self):
         # Edit path on item
         Edit = QAction("Edit Path", self)
         Edit.triggered.connect(lambda: EditDir())
+        Edit.setIcon(QIcon("Images/Edit.ico"))
         self.contextMenu.addAction(Edit)
 
         # Create changelog with todays date
         # TODO: ** I may make this into a custom file with a header / metadata one day
         # show only if file doesn't already exist
         if not isfile(Folder.FileToday()):
-            Create = QAction("Create new changelog for today", self)
-            Create.triggered.connect(lambda: CreateChangelog())
-            self.contextMenu.addAction(Create)
+            CreateOpen = QAction("Create " + Folder.GetDate("%d.%m.%y.txt"), self)
+            CreateOpen.setIcon(QIcon("Images/Create.ico"))
+            CreateOpen.triggered.connect(lambda: CreateChangelog())
+        else:
+            CreateOpen = QAction("Open "  + Folder.GetDate("%d.%m.%y.txt"), self)
+            CreateOpen.setIcon(QIcon("Images/Open.ico"))
+            CreateOpen.triggered.connect(lambda: ViewChangelog(Folder.GetPath() + Folder.GetDate("%d.%m.%y.txt")))
+        
+        self.contextMenu.addAction(CreateOpen)
 
         # View previous changelog
         # show only if there is more than 1 file
         if len(Folder.allfiles) > 1:
             View = QAction("View last changelog", self)
-            View.triggered.connect(lambda: ViewChangelog())
+            View.triggered.connect(lambda: ViewChangelog(Folder.FileLast()))
+            View.setIcon(QIcon("Images/View.ico"))
             self.contextMenu.addAction(View)
 
         # TODO: MERGELOG
@@ -83,6 +113,7 @@ def Start(self):
         # Merge files into one single file  
         Merge = QAction("Update mergelog", self)
         Merge.triggered.connect(lambda: print("Merge all cahngelogs into a single file"))
+        Merge.setIcon(QIcon("Images/Merge.ico"))
         self.contextMenu.addAction(Merge)
 
         # Show Menu
