@@ -1,5 +1,11 @@
-location: "\u266A\u266A \u30FD(\u02C7\u2200\u02C7 )\u309E"
-name: Test 01
+location: "(\u0361 \xB0 \u035C\u0296 \u0361 \xB0)"
+name: '5'
 ---
-location: C:/Users/lokih/Downloads/Folder4
-name: "( \u02D8 \xB3\u02D8)\u2665"
+location: C:/Users/lokih/Downloads/Folder3
+name: C:/users/lokih/downloads/folder3
+---
+location: "\\(\u1D54\u1D55\u1D54)/"
+name: C:/users/lokih/downloads/folder3
+---
+location: C:/Users/lokih/Downloads
+name: '1'

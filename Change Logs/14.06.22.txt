@@ -1,0 +1,9 @@
+_________
+
+14/06/22:
+_________
+
+% updated All .icos 's and .ase 's
+% updated Context Menu.py
+% updated Tool.py
+	- Now only primary button triggers context menu (right click is avoided for now due to unintentional ui popup in windows)
