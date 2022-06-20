@@ -1,18 +1,30 @@
 # Change-Log-Tool
 
+Note: alot of issues and missing features still remain - if anyone can provide better documentation for this under **Features** or **Controls** it would be vastly appreciated
+
 ### Controls:
--  Right click - Edits selected cell / Opens Context menu for selected cell
+-  Right click - selects entire row (unused)
+-  Left click - Edit selected cell
 -  [+] - Adds a row
 -  [-] - Removes selected row
 
 ### Features:
-- Stores Changelogs location and name
-- More to be added soon.... 
-   -   Changelog explorer
-   -   Maybe (but seems very much like a gimmick (infact it is)): Changelog compatability perceptron (bassically a perceptron which looks through all your   other changelogs and sees if they match or if theres problems with them - such as a different format)
-   -   Settings menu
-   -   Mergelog (merges all changelogs into a single file - with option to delete whats been merged or to keep it)
-   -   Maybe: Custom file type (which would be read by a custom editor built within this app - however this largely increases the scope so will be left for later)
+- Stores paths of changelog directories alongside a name
+- Allows creation of a changelog for every day
+- Allows quick context menu for editing previous changelog and current day's changelog (Will be updated with changelog view soon and maybe even an entire editor)
+- Mergelog 
+   - Copies all files into a single one
+   - Creates any missing files in directory
+   - Can be updated
+   - All changelogs in directory can be deleted once Mergelog is updated/created
+
+### To add:
+Check Issues!
+
+### Works on:
+- Windows: Yes!
+- Mac: Needs testing!
+- Linux: Uknown!
 
 ### Dev:
 - Requires:
