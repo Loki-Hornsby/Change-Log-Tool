@@ -41,45 +41,6 @@ class TableView(QTableWidget):
         
         return item
 
-    # Cancel swapping by restting items to previous text
-    def SwapCancel(self):
-        for i in range(self.columnCount()):
-            firstText = str(self.storedSwapText[i])
-            secondText = str(self.item(self.currentRow(), i).text())
-
-            self.item(self.currentRow(), i).setText(secondText)
-            self.item(self.storedSwapRow, i).setText(firstText)
-
-            User.Data.Update(self.item(self.currentRow(), i), self.currentRow(), i)
-            User.Data.Update(self.item(self.storedSwapRow, i), self.storedSwapRow, i)
-
-    def SwapCells(self, state):
-        # Select and Reset
-        if state == 1:
-            for i in range(len(self.storedSwapText)):
-                del self.storedSwapText[0]
-
-            for i in range(self.columnCount()):
-                self.storedSwapText.append(self.item(self.currentRow(), i).text())
-                self.item(self.currentRow(), i).setText("Moving...")
-
-        # Swap
-        elif state == 2:
-            if self.storedSwapRow != self.currentRow():
-                for i in range(self.columnCount()):
-                    firstText = str(self.storedSwapText[i])
-                    secondText = str(self.item(self.currentRow(), i).text())
-
-                    self.item(self.currentRow(), i).setText(firstText)
-                    self.item(self.storedSwapRow, i).setText(secondText)
-
-                    User.Data.Update(self.item(self.currentRow(), i), self.currentRow(), i)
-                    User.Data.Update(self.item(self.storedSwapRow, i), self.storedSwapRow, i)
-            else:
-                self.SwapCancel()
-
-        self.update()
-
     def __init__(self, y, x, *args):
         # Setup
         QTableWidget.__init__(self, *args)
@@ -91,11 +52,6 @@ class TableView(QTableWidget):
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.verticalHeader().hide()
-
-        # Swap
-        self.storedSwapRow = 0
-        self.swapState = 0
-        self.storedSwapText = []
 
         # Input cell Data
         for x in range(len(User.Data.Data)): # Row
@@ -109,6 +65,7 @@ class TableView(QTableWidget):
             else:
                 self.setItemDelegateForColumn(i, self.CenterDelegate(self)) 
 
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setSelectionMode(QTableWidget.SingleSelection)   
 
         # Update Data
@@ -117,37 +74,19 @@ class TableView(QTableWidget):
     def mousePressEvent(self, QMouseEvent):
         # Get index + item
         self.index = self.indexAt(QMouseEvent.pos())
-        item = self.item(self.index.row(), self.index.column())
 
-        # Set selection
+        # Reset selection
         self.clearSelection()
-        self.setCurrentItem(item)
 
+        # Select Item
+        self.setCurrentItem(self.item(self.index.row(), self.index.column()))
+
+        # Remove button
         if QMouseEvent.button() == Qt.LeftButton:
-            print(self.swapState)
-
-            # Reset cell Swap
-            if self.swapState != 0:
-                if self.swapState == 1:
-                    self.SwapCancel()
-
-                self.swapState = 0
-
             # Open Context Menu
             ContextMenu.Start(self)
-        elif QMouseEvent.button() == Qt.RightButton: 
-            self.swapState += 1
-
-            # Set swap row
-            if self.swapState != 2:
-                self.storedSwapRow = self.currentRow()
-
-            if self.swapState > 2:
-                self.swapState = 1
-
-        # Handle Swapping cells
-        self.selected = self.item(self.index.row(), self.index.column())
-        self.SwapCells(self.swapState)
+        elif QMouseEvent.button() == Qt.RightButton:
+            pass
 
     def ItemModified(self, item):
         if User.Data.StoredKeys[self.currentColumn()] != "location":
