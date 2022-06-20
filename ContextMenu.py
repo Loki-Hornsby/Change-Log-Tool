@@ -48,7 +48,7 @@ def Start(self):
             # TODO: Convert to function
             with open(file) as f:
                 # [:-1] to remove ":"
-                thirdline = f.read().split('\n')[2][:-1]
+                thirdline = f.read().split('\n')[3][:-1]
                 # Header date
                 title = file[(len(file) - len("dd.mm.yy.txt")) : (len(file) - len(".txt"))]
             
