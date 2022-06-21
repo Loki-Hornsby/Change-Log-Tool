@@ -3,9 +3,6 @@ import yaml
 import random
 import math
 
-class Preferences:
-    likescheese = True
-
 class Data:
     GeneratorData = None
     Data = None

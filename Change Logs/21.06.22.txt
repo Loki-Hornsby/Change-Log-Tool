@@ -1,0 +1,8 @@
+_________
+
+21/06/22:
+_________
+
+% updated Tool.py
+	Trying to use YAML to handle everything!
+		then i'm going to try add massive compression (since yaml is predictable and simple)

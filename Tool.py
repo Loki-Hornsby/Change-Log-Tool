@@ -34,30 +34,30 @@ class TableView(QTableWidget):
         # X: Rows
         self.setVerticalHeaderLabels(y)
         self.setHorizontalHeaderLabels(x)
-    
-    def CreateItem(self, data):
-        item = QTableWidgetItem(data)
-        item.setTextAlignment(Qt.AlignCenter) 
-        
-        return item
 
-    def __init__(self, y, x, *args):
-        # Setup
-        QTableWidget.__init__(self, *args)
-        self.SetData(y, x)
+        # Input cell Data
+        for i in range(len(User.Data.Data)): # Row
+            for j in range(len(User.Data.StoredKeys)): # Column
+                data = User.Data.StoredValues[i][j]
+
+                # If it's not a dict
+                if type(data) != type({}):
+                    item = QTableWidgetItem(data)
+                    item.setTextAlignment(Qt.AlignCenter) 
+                    self.setItem(i, j, item)
+                    #self.setSpan(i, j, len(y), 1)
+
+        # Resize
         self.resizeRowsToContents()
         self.resizeColumnsToContents()
 
+    def SetTitles(self):
         # Titles
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.verticalHeader().hide()
+        #self.verticalHeader().hide()
 
-        # Input cell Data
-        for x in range(len(User.Data.Data)): # Row
-            for y in range(len(User.Data.StoredKeys)): # Column
-                self.setItem(x, y, self.CreateItem(User.Data.StoredValues[x][y]))
-        
+    def SetBehaviours(self):
         # Behaviours 
         for i in range(self.columnCount()):
             if User.Data.StoredKeys[i] == "location":
@@ -67,6 +67,17 @@ class TableView(QTableWidget):
 
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setSelectionMode(QTableWidget.SingleSelection)   
+
+    def __init__(self, y, x, *args):
+        # Setup
+        QTableWidget.__init__(self, *args)
+        self.SetData(y, x)
+
+        # Titles
+        self.SetTitles()
+
+        # Behaviours 
+        self.SetBehaviours()
 
         # Update Data
         self.itemChanged.connect(lambda item: self.ItemModified(item))
@@ -93,7 +104,7 @@ class TableView(QTableWidget):
             CapitalizedInput = " ".join([x.capitalize() for x in item.text().split()])
 
             if item.text() != CapitalizedInput:
-                self.setItem(self.currentRow(), self.currentColumn(), self.CreateItem(CapitalizedInput))
+                self.setItem(self.currentRow(), self.currentColumn(), QTableWidgetItem(CapitalizedInput))
                 return
         
         User.Data.Update(item, self.currentRow(), self.currentColumn())
@@ -104,7 +115,7 @@ class TableView(QTableWidget):
         User.Data.AddDoc()
 
         for i in range(self.columnCount()):
-            self.setItem(self.rowCount()-1, i, self.CreateItem(User.Data.GetPlaceholder()))
+            self.setItem(self.rowCount()-1, i, QTableWidgetItem(User.Data.GetPlaceholder()))
 
         if self.rowCount() == 2:
             button.setEnabled(True)
@@ -139,9 +150,12 @@ class Window(QWidget):
         # Layout setup
         main_layout = QHBoxLayout()
         group_box = QGroupBox("Change Log Tool")
-        group_box_layout = QVBoxLayout()
+        
+        base_layout = QVBoxLayout()
+        horizontal_layout = QHBoxLayout()
+        vertical_layout = QVBoxLayout()
 
-        # Table
+        # Data Table
         rows = [str(x+1) for x in range(len(User.Data.Data))]
         columns = User.Data.StoredKeys
 
@@ -152,7 +166,20 @@ class Window(QWidget):
             len(columns)     # X Length
         )
 
-        group_box_layout.addWidget(self.DataTable)
+        horizontal_layout.addWidget(self.DataTable)
+
+        # Changelog Table
+        rows = ["1.1.1 TEST", "2.2.2 TEST"]
+        columns = ["Name TEST", "Contents TEST"]
+
+        self.ChangelogTable = TableView(
+            rows,            # Y Data
+            columns,         # X Data
+            len(rows),       # Y length
+            len(columns)     # X Length
+        )
+
+        horizontal_layout.addWidget(self.ChangelogTable)
 
         # Grid for buttons
         grid = QGridLayout()
@@ -161,7 +188,7 @@ class Window(QWidget):
         grid.setColumnStretch(2, 1)
         grid.setColumnStretch(3, 4)
         grid.setColumnStretch(4, 4)
-        group_box_layout.addLayout(grid)
+        vertical_layout.addLayout(grid)
 
         # Add item to table
         self.add = QPushButton('+', self)
@@ -176,7 +203,11 @@ class Window(QWidget):
         grid.addWidget(self.remove, 0, 3)
         
         # Finalise Ui Setup
-        group_box.setLayout(group_box_layout)
+        base_layout.addLayout(horizontal_layout)
+        base_layout.addLayout(vertical_layout)
+        
+        group_box.setLayout(base_layout)
+
         main_layout.addWidget(group_box)
         self.setLayout(main_layout)
         
